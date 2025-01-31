@@ -1,0 +1,34 @@
+name: Deploy to Apple Store (iOS)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: brew install love
+
+      - name: Package Love2D game
+        run: |
+          mkdir -p build
+          zip -r build/game.love . -x "build/*" ".git/*" ".github/*"
+
+      - name: Deploy to Apple Store
+        uses: love-actions/love-actions-ios@v1
+        with:
+          love-file: build/game.love
+          bundle-id: "com.yourcompany.love2dgame"
+          team-id: ${{ secrets.APPLE_TEAM_ID }}
+          app-store-connect-api-key-id: ${{ secrets.APP_STORE_KEY_ID }}
+          app-store-connect-api-key-issuer: ${{ secrets.APP_STORE_ISSUER_ID }}
+          app-store-connect-api-key: ${{ secrets.APP_STORE_PRIVATE_KEY }}
+          itunes-connect-user: ${{ secrets.ITUNES_USER }}
+          itunes-connect-password: ${{ secrets.ITUNES_PASSWORD }}
